@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+    <title>js</title>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const canvasWidth = innerWidth - 5,
+        canvasHeight = innerHeight - 5;
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+      var ballNumber = 100,
+        mouse = { x: innerWidth / 2, y: innerHeight / 2 },
+        colors = ["#ff5722", "#ffc107", "#e91e63", "#3f51b5"],
+        minRadius = 8,
+        maxRadius = 20,
+        gravity = 1,
+        friction = 0.95;
+      addEventListener("mousemove", function (event) {
+        mouse.x = event.clientX;
+        mouse.y = event.clientY;
+      });
+      addEventListener("resize", function () {
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+      });
+      function randomNumber(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
+      }
+      function randomColor(colors) {
+        return colors[Math.floor(Math.random() * colors.length)];
+      }
+
+      function Ball(x, y, dx, dy, r, color) {
+        this.x = x;
+        this.y = y;
+        this.dx = dx;
+        this.dy = dy;
+        this.r = r;
+        this.color = color;
+        this.update = function () {
+          if (
+            this.y + this.r + this.dy > canvasHeight ||
+            this.r + this.y + this.dy == canvasHeight
+          ) {
+            this.dy = -this.dy * friction;
+          } else {
+            this.dy += gravity;
+          }
+          if (this.x + this.r + this.dx > canvasWidth || this.x - this.r <= 0) {
+            this.dx = -this.dx * friction;
+          }
+          this.x += this.dx;
+          this.y += this.dy;
+          this.draw();
+        };
+        this.draw = function () {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+          ctx.closePath();
+          ctx.stroke();
+        };
+      }
+      var ball;
+      var ballArray = [];
+      function init() {
+        for (var i = 0; i < ballNumber; i++) {
+          var r = randomNumber(minRadius, maxRadius),
+            x = randomNumber(r, canvasWidth - r),
+            y = randomNumber(-r, canvasHeight - 2 * r),
+            dx = randomNumber(-2, 2);
+          (dy = randomNumber(-2, 2)), (color = randomColor(colors));
+          ballArray.push(new Ball(x, y, dx, dy, r, color));
+        }
+      }
+      function animate() {
+        requestAnimationFrame(animate);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (var i = 0; i < ballArray.length; i++) {
+          ballArray[i].update();
+        }
+      }
+      init();
+      animate();
+    </script>
+  </body>
+</html>
